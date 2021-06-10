@@ -17,23 +17,16 @@
 - Modify your ESX config with `Config.Multichar = true`
 - Set your database name for `Config.Database` in server/main.lua
 - All owner and identifier columns should be set to `VARCHAR(60)` to ensure correct data entry
-- Add the following command to easily update all of your SQL tables
-
-```lua
-	RegisterCommand('varchar', function(source)
-		if source == 0 then
-			for _, itable in pairs(IdentifierTables) do
-				print('Setting `'..itable.table..'` column `'..itable.column..'` to VARCHAR(60)')
-				MySQL.Sync.execute("ALTER TABLE "..itable.table.." MODIFY COLUMN "..itable.column.." VARCHAR(60)", {})
-			end
-		end
-	end, true)
-```
+- Use the `varchar` command from the console to update your SQL tables
+- Once you have used the command you should just remove it for sanity's sake
 ### Relogging
 - Modify the config with `Config.Relog = true`
 - Use the latest version of [ESX Status](https://github.com/esx-framework/esx_status)
+- If you have any threads running with `while true do` I recommend using `while ESX.PlayerLoaded do` instead
+	- For threads that are triggered by a spawn/load event this will ensure they do not start a second time
+	- You can clear loops that may break after ESX.PlayerData is cleared
+	- For an example, refer to my [boilerplate](https://github.com/thelindat/esx_legacy_boilerplate/blob/main/client.lua)
 - Add the following event to any resources that will benefit from clearing ESX.PlayerData
-
 ```lua
 RegisterNetEvent('esx:playerLoaded')
 AddEventHandler('esx:playerLoaded', function(xPlayer)
@@ -47,7 +40,6 @@ AddEventHandler('esx:onPlayerLogout', function()
 	ESX.PlayerData = {}
 end)
 ```
-- If you have any threads running with `while true do` you should change them to `while ESX.PlayerLoaded do`
 
 #### The menu interface is esx_menu_default - you can use any version if you want a different appearance
 ![image](https://user-images.githubusercontent.com/65407488/119010385-592a8c80-b9d7-11eb-9aa1-eb7051004843.png)
