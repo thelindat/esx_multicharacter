@@ -93,7 +93,7 @@ if ESX.GetConfig().Multichar == true then
 	RegisterServerEvent("esx_multicharacter:CharacterChosen")
 	AddEventHandler('esx_multicharacter:CharacterChosen', function(charid, isNew)
 		local src = source
-		if type(charid) == 'number' and string.len(charid) == 1 and type(isNew) == 'boolean' then
+		if type(charid) == 'number' and string.len(charid) <= 2 and type(isNew) == 'boolean' then
 			if isNew then
 				awaitingRegistration[src] = charid
 			else
@@ -116,7 +116,7 @@ if ESX.GetConfig().Multichar == true then
 	RegisterServerEvent("esx_multicharacter:DeleteCharacter")
 	AddEventHandler('esx_multicharacter:DeleteCharacter', function(charid)
 		local src = source
-		if type(charid) == "number" and string.len(charid) == 1 then
+		if type(charid) == "number" and string.len(charid) <= 2 then
 			DeleteCharacter(src, charid)
 			SetupCharacters(src)
 		else
