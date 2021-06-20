@@ -4,7 +4,7 @@ if ESX.GetConfig().Multichar == true then
 	local IdentifierTables = {}
 	
 	-- enter the name of your database here
-	Config.Database = 'es_extended'
+	Config.Database = 'replace_this'
 	-- enter a prefix to prepend to all user identifiers (keep it short)
 	Config.Prefix = 'char'
 	
