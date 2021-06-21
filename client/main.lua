@@ -283,13 +283,14 @@ if ESX.GetConfig().Multichar then
 				end)
 			end)
 		else
-			TriggerEvent('skinchanger:loadSkin', Characters[Spawned].skin)
+			TriggerEvent('skinchanger:loadSkin', skin or Characters[Spawned].skin)
 			Citizen.Wait(1500)
 		end
 		Characters = {}
 		TriggerServerEvent('esx:onPlayerSpawn')
 		TriggerEvent('esx:onPlayerSpawn')
 		TriggerEvent('playerSpawned')
+		TriggerEvent('esx:restoreLoadout')
 		playerPed = PlayerPedId()
 		FreezeEntityPosition(playerPed, false)
 		SetEntityHeading(PlayerPed, spawn.heading)
