@@ -109,9 +109,10 @@ if ESX.GetConfig().Multichar then
 					end
 					TriggerEvent('skinchanger:loadSkin', skin)
 				end
+				DoScreenFadeIn(400)
+				while IsScreenFadedOut() do Citizen.Wait(100) end
 			end)
-			DoScreenFadeIn(400)
-			while IsScreenFadedOut() do Citizen.Wait(100) end
+			
 		elseif Characters[index] and Characters[index].skin then
 			if Characters[Spawned] and Characters[Spawned].model then
 				RequestModel(Characters[index].model)
@@ -124,11 +125,15 @@ if ESX.GetConfig().Multichar then
 			end
 			TriggerEvent('skinchanger:loadSkin', Characters[index].skin)
 		end
-		FreezeEntityPosition(PlayerPedId(), true)
 		Spawned = index
 		local playerPed = PlayerPedId()
+		FreezeEntityPosition(PlayerPedId(), true)
 		SetPedAoBlobRendering(playerPed, true)
 		SetEntityAlpha(playerPed, 255)
+		SendNUIMessage({
+			action = "openui",
+			character = Characters[Spawned]
+		})
 	end
 	
 	RegisterNetEvent('esx_multicharacter:SetupUI')
@@ -171,10 +176,6 @@ if ESX.GetConfig().Multichar then
 			if #elements < Config.Slots then
 				elements[#elements+1] = {label = _('create_char'), value = (#elements+1), new = true}
 			end
-			SendNUIMessage({
-				action = "openui",
-				character = Characters[Spawned]
-			})
 			ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'selectchar', {
 				title    = _('select_char'),
 				align    = 'top-left',
