@@ -242,6 +242,10 @@ if ESX.GetConfig().Multichar then
 						action = "closeui"
 					})
 				else
+					SendNUIMessage({
+						action = "openui",
+						character = Characters[data.current.value]
+					})
 					SetupCharacter(data.current.value)
 					local playerPed = PlayerPedId()
 					SetPedAoBlobRendering(playerPed, true)
