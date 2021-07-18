@@ -130,10 +130,18 @@ if ESX.GetConfig().Multichar then
 		FreezeEntityPosition(PlayerPedId(), true)
 		SetPedAoBlobRendering(playerPed, true)
 		SetEntityAlpha(playerPed, 255)
-		SendNUIMessage({
-			action = "openui",
-			character = Characters[Spawned]
-		})
+		local screenFadedIn = false
+		while screenFadedIn == false do
+			if IsScreenFadedOut() == 1 then
+				Citizen.Wait(1)
+			else
+			SendNUIMessage({
+				action = "openui",
+				character = Characters[Spawned]
+			})
+			screenFadedIn = true
+			end
+		end
 	end
 	
 	RegisterNetEvent('esx_multicharacter:SetupUI')
