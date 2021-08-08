@@ -12,6 +12,9 @@ elseif ESX.GetConfig().Multichar == true then
 	local SetupCharacters = function(playerId)
 		while Fetch == -1 do Citizen.Wait(500) end
 		local identifier = Config.Prefix..'%:'..ESX.GetIdentifier(playerId)
+		local slots = MySQL.Sync.fetchScalar("SELECT `slots` FROM `multicharacter_slots` WHERE identifier LIKE @identifier", {
+			['@identifier'] = ESX.GetIdentifier(playerId)
+		})
 		MySQL.Async.fetchAll(Fetch, {
 			identifier,
 			Config.Slots
@@ -38,7 +41,7 @@ elseif ESX.GetConfig().Multichar == true then
 				}
 				if result[i].sex == 'm' then characters[id].sex = _('male') else characters[id].sex = _('female') end
 			end
-			TriggerClientEvent('esx_multicharacter:SetupUI', playerId, characters)
+			TriggerClientEvent('esx_multicharacter:SetupUI', playerId, characters, slost)
 		end)
 	end
 
@@ -121,6 +124,27 @@ elseif ESX.GetConfig().Multichar == true then
 	AddEventHandler('esx_multicharacter:relog', function()
 		local src = source
 		TriggerEvent('esx:playerLogout', src)
+	end)
+
+	AddEventHandler('playerConnecting', function()
+		local src = source
+		local identifier = false
+
+		for k,v in pairs(GetPlayerIdentifiers(source)) do
+			if string.sub(v, 1, string.len("license:")) == "license:" then
+				identifier = string.sub(v, 9)
+			end
+		end
+
+		local slots = MySQL.Sync.fetchScalar("SELECT `slots` FROM `multicharacter_slots` WHERE identifier LIKE @identifier", {
+			['@identifier'] = identifier
+		})
+
+		if slots == nil then
+			MySQL.Async.execute('INSERT INTO multicharacter_slots (identifier, slots) VALUES (@identifier, 1)', {
+				['@identifier'] = identifier
+			})
+		end
 	end)
 
 	RegisterCommand('forcelog', function(source, args, rawCommand)
