@@ -15,6 +15,9 @@ elseif ESX.GetConfig().Multichar == true then
 		local slots = MySQL.Sync.fetchScalar("SELECT `slots` FROM `multicharacter_slots` WHERE identifier = ?", {
 			ESX.GetIdentifier(playerId)
 		})
+		if not slots then
+			slots = Config.Slots
+		end
 		MySQL.Async.fetchAll(Fetch, {
 			identifier,
 			slots
@@ -126,26 +129,23 @@ elseif ESX.GetConfig().Multichar == true then
 		TriggerEvent('esx:playerLogout', src)
 	end)
 
-	AddEventHandler('playerConnecting', function()
-		local src = source
-		local identifier = false
+	RegisterCommand('setslots', function(source, args, rawCommand)
 
-		for k,v in pairs(GetPlayerIdentifiers(source)) do
-			if string.sub(v, 1, string.len("license:")) == "license:" then
-				identifier = string.sub(v, 9)
-			end
-		end
+		-- slice args and take license and slots count
 
 		local slots = MySQL.Sync.fetchScalar("SELECT `slots` FROM `multicharacter_slots` WHERE identifier = ?", {
 			identifier
 		})
 
 		if slots == nil then
-			MySQL.Async.execute('INSERT INTO multicharacter_slots (identifier, slots) VALUES (?, 1)', {
-				identifier
-			})
+			-- insert query
+			-- MySQL.Async.execute('INSERT INTO multicharacter_slots (identifier, slots) VALUES (?, 1)', {
+			-- 	identifier
+			-- })
+		else
+			-- alter table
 		end
-	end)
+	end, true)
 
 	RegisterCommand('forcelog', function(source, args, rawCommand)
 		TriggerEvent('esx:playerLogout', source)
