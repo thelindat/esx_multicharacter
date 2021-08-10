@@ -129,23 +129,43 @@ elseif ESX.GetConfig().Multichar == true then
 		TriggerEvent('esx:playerLogout', src)
 	end)
 
-	RegisterCommand('setslots', function(source, args, rawCommand)
-
-		-- slice args and take license and slots count
-
-		local slots = MySQL.Sync.fetchScalar("SELECT `slots` FROM `multicharacter_slots` WHERE identifier = ?", {
-			identifier
+	ESX.RegisterCommand('setslots', 'admin', function(xPlayer, args, showError)
+		local slots = MySQL.Sync.fetchScalar('SELECT `slots` FROM `multicharacter_slots` WHERE identifier = ?', {
+			args.identifier
 		})
 
 		if slots == nil then
-			-- insert query
-			-- MySQL.Async.execute('INSERT INTO multicharacter_slots (identifier, slots) VALUES (?, 1)', {
-			-- 	identifier
-			-- })
+			MySQL.Async.execute('INSERT INTO `multicharacter_slots` (`identifier`, `slots`) VALUES (?, ?)', {
+				args.identifier,
+				args.slots
+			})
+			xPlayer.triggerEvent('esx:showNotification', _U('slotsadd', args.slots, args.identifier))
 		else
-			-- alter table
+			MySQL.Async.execute('UPDATE `multicharacter_slots` SET `slots` = ? WHERE `identifier` = ?', {
+				args.slots,
+				args.identifier
+			})
+			xPlayer.triggerEvent('esx:showNotification', _U('slotsedit', args.slots, args.identifier))
 		end
-	end, true)
+	end, true, {help = _U('command_setslots'), validate = true, arguments = {
+		{name = 'identifier', help = _U('command_identifier'), type = 'string'},
+		{name = 'slots', help = _U('command_slots'), type = 'number'}
+	}})
+
+	ESX.RegisterCommand('remslots', 'admin', function(xPlayer, args, showError)
+		local slots = MySQL.Sync.fetchScalar('SELECT `slots` FROM `multicharacter_slots` WHERE identifier = ?', {
+			args.identifier
+		})
+
+		if slots ~= nil then
+			MySQL.Async.execute('DELETE FROM `multicharacter_slots` WHERE `identifier` = ?', {
+				args.identifier
+			})
+			xPlayer.triggerEvent('esx:showNotification', _U('slotsrem', args.identifier))
+		end
+	end, true, {help = _U('command_remslots'), validate = true, arguments = {
+		{name = 'identifier', help = _U('command_identifier'), type = 'string'}
+	}})
 
 	RegisterCommand('forcelog', function(source, args, rawCommand)
 		TriggerEvent('esx:playerLogout', source)
