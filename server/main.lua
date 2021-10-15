@@ -12,9 +12,8 @@ elseif ESX.GetConfig().Multichar == true then
 	local SetupCharacters = function(playerId)
 		while Fetch == -1 do Citizen.Wait(500) end
 		local identifier = Config.Prefix..'%:'..ESX.GetIdentifier(playerId)
-		local charless_identifier = ESX.GetIdentifier(playerId)
 		local slots = MySQL.Sync.fetchScalar("SELECT `slots` FROM `multicharacter_slots` WHERE identifier = ?", {
-			charless_identifier
+			ESX.GetIdentifier(playerId)
 		})
 		if not slots then
 			slots = Config.Slots
