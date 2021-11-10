@@ -99,7 +99,7 @@ elseif ESX.GetConfig().Multichar == true then
 				deferrals.done()
 			end
 		else
-			deferrals.done(('Unable to retrieve player identifier.\nIdentifier type: %s'):format(PRIMARY_IDENTIFIER)
+			deferrals.done('Unable to retrieve player identifier.\nIdentifier type: %s'):format(PRIMARY_IDENTIFIER)
 		end
 	end)
 
