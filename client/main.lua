@@ -7,7 +7,7 @@ if ESX.GetConfig().Multichar then
 			if NetworkIsPlayerActive(PlayerId()) then
 				exports.spawnmanager:setAutoSpawn(false)
 				DoScreenFadeOut(0)
-				while not GetResourceState('esx_menu_default') == 'started' do 
+				while not GetResourceState('esx_menu_default') == 'started' do
 					Citizen.Wait(0)
 				end
 				TriggerEvent("esx_multicharacter:SetupCharacters")
@@ -16,15 +16,14 @@ if ESX.GetConfig().Multichar then
 		end
 	end)
 
-
-	local canRelog, cam, Spawned = true
+	local canRelog, cam, spawned = true, nil, nil
 	local Characters =  {}
 
 	RegisterNetEvent('esx_multicharacter:SetupCharacters')
 	AddEventHandler('esx_multicharacter:SetupCharacters', function()
 		ESX.PlayerLoaded = false
 		ESX.PlayerData = {}
-		Spawned = false
+		spawned = false
 		cam = CreateCam("DEFAULT_SCRIPTED_CAMERA", true)
 		local playerPed = PlayerPedId()
 		SetEntityCoords(playerPed, Config.Spawn.x, Config.Spawn.y, Config.Spawn.z, true, false, false, false)
@@ -63,7 +62,7 @@ if ESX.GetConfig().Multichar then
 				HideHudComponentThisFrame(12)
 				HideHudComponentThisFrame(21)
 				HideHudAndRadarThisFrame()
-				Citizen.Wait(3)
+				Citizen.Wait(0)
 				local vehicles = GetGamePool('CVehicle')
 				for i=1, #vehicles do
 					SetEntityLocallyInvisible(vehicles[i])
@@ -85,19 +84,19 @@ if ESX.GetConfig().Multichar then
 					local player = players[i]
 					if player ~= PlayerId() and not playerPool[player] then
 						playerPool[player] = true
-						NetworkConcealPlayer(players[player], true, true)
+						NetworkConcealPlayer(player, true, true)
 					end
 				end
 				Citizen.Wait(500)
 			end
-			for i=1, #playerPool do
-				NetworkConcealPlayer(playerPool[i], false, false)
+			for k in pairs(playerPool) do
+				NetworkConcealPlayer(k, false, false)
 			end
 		end)
 	end
 
 	SetupCharacter = function(index)
-		if Spawned == false then
+		if spawned == false then
 			exports.spawnmanager:spawnPlayer({
 				x = Config.Spawn.x,
 				y = Config.Spawn.y,
@@ -117,9 +116,9 @@ if ESX.GetConfig().Multichar then
 				DoScreenFadeIn(400)
 			end)
 		repeat Citizen.Wait(200) until not IsScreenFadedOut()
-			
+
 		elseif Characters[index] and Characters[index].skin then
-			if Characters[Spawned] and Characters[Spawned].model then
+			if Characters[spawned] and Characters[spawned].model then
 				RequestModel(Characters[index].model)
 				while not HasModelLoaded(Characters[index].model) do
 					RequestModel(Characters[index].model)
@@ -130,22 +129,22 @@ if ESX.GetConfig().Multichar then
 			end
 			TriggerEvent('skinchanger:loadSkin', Characters[index].skin)
 		end
-		Spawned = index
+		spawned = index
 		local playerPed = PlayerPedId()
 		FreezeEntityPosition(PlayerPedId(), true)
 		SetPedAoBlobRendering(playerPed, true)
 		SetEntityAlpha(playerPed, 255)
 		SendNUIMessage({
 			action = "openui",
-			character = Characters[Spawned]
+			character = Characters[spawned]
 		})
 	end
-	
+
 	RegisterNetEvent('esx_multicharacter:SetupUI')
 	AddEventHandler('esx_multicharacter:SetupUI', function(data, slots)
 		DoScreenFadeOut(0)
 		Characters = data
-		local slots = slots
+		slots = slots
 		local elements = {}
 		local Character = next(Characters)
 		exports.spawnmanager:forceRespawn()
@@ -176,9 +175,9 @@ if ESX.GetConfig().Multichar then
 				if not v.model and v.skin then
 					if v.skin.model then v.model = v.skin.model elseif v.skin.sex == 1 then v.model =  `mp_f_freemode_01` else v.model = `mp_m_freemode_01` end
 				end
-				if Spawned == false then SetupCharacter(Character) end
+				if spawned == false then SetupCharacter(Character) end
 				local label = v.firstname..' '..v.lastname
-				if Characters[k].disabled == 1 then
+				if Characters[k].disabled then
 					elements[#elements+1] = {label = label, value = v.id}
 				else
 					elements[#elements+1] = {label = label, value = v.id}
@@ -194,10 +193,10 @@ if ESX.GetConfig().Multichar then
 			}, function(data, menu)
 				local elements = {}
 				if not data.current.new then
-					if Characters[data.current.value].disabled == 0 then 
-						elements[1] = {label = _('char_play'), action = 'play', value = data.current.value} 
+					if not Characters[data.current.value].disabled then 
+						elements[1] = {label = _('char_play'), action = 'play', value = data.current.value}
 					else
-						elements[1] = {label = _('char_disabled'), value = data.current.value} 
+						elements[1] = {label = _('char_disabled'), value = data.current.value}
 					end
 					if Config.CanDelete then elements[2] = {label = _('char_delete'), action = 'delete', value = data.current.value} end
 					ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'choosechar', {
@@ -222,7 +221,7 @@ if ESX.GetConfig().Multichar then
 							}, function(data, menu)
 								if data.current.value then
 									TriggerServerEvent('esx_multicharacter:DeleteCharacter', data.current.value)
-									Spawned = false
+									spawned = false
 									ESX.UI.Menu.CloseAll()
 								else
 									menu.close()
@@ -294,15 +293,15 @@ if ESX.GetConfig().Multichar then
 			repeat Citizen.Wait(200) until finished
 		end
 		DoScreenFadeOut(100)
-		repeat Citizen.Wait(200) until IsScreenFadedOut()
+
 		SetCamActive(cam, false)
 		RenderScriptCams(false, false, 0, true, true)
 		cam = nil
 		local playerPed = PlayerPedId()
 		FreezeEntityPosition(playerPed, true)
-		SetEntityCoords(playerPed, spawn.x, spawn.y, spawn.z-1.3, true, false, false, false)
+		SetEntityCoordsNoOffset(playerPed, spawn.x, spawn.y, spawn.z, false, false, false, true)
 		SetEntityHeading(playerPed, spawn.heading)
-		if not isNew then TriggerEvent('skinchanger:loadSkin', skin or Characters[Spawned].skin) end
+		if not isNew then TriggerEvent('skinchanger:loadSkin', skin or Characters[spawned].skin) end
 		Citizen.Wait(400)
 		DoScreenFadeIn(400)
 		repeat Citizen.Wait(200) until not IsScreenFadedOut()
@@ -316,7 +315,7 @@ if ESX.GetConfig().Multichar then
 	RegisterNetEvent('esx:onPlayerLogout')
 	AddEventHandler('esx:onPlayerLogout', function()
 		DoScreenFadeOut(0)
-		Spawned = false
+		spawned = false
 		TriggerEvent("esx_multicharacter:SetupCharacters")
 		TriggerEvent('esx_skin:resetFirstSpawn')
 	end)
