@@ -131,7 +131,7 @@ if ESX.GetConfig().Multichar then
 		end
 		spawned = index
 		local playerPed = PlayerPedId()
-		FreezeEntityPosition(PlayerPedId(), true)
+		FreezeEntityPosition(playerPed, true)
 		SetPedAoBlobRendering(playerPed, true)
 		SetEntityAlpha(playerPed, 255)
 		SendNUIMessage({
