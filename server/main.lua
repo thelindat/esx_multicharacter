@@ -48,12 +48,12 @@ elseif ESX.GetConfig().Multichar == true then
 		local identifier = GetIdentifier(source)
 		ESX.Players[identifier] = true
 
-		local slots = MySQL.Sync.fetchScalar("SELECT slots FROM multicharacter_slots WHERE identifier = ?", {
+		local slots = MySQL.scalar.await("SELECT slots FROM multicharacter_slots WHERE identifier = ?", {
 			identifier
 		}) or SLOTS
 		identifier = PREFIX..'%:'..identifier
 
-		MySQL.Async.fetchAll(FETCH, {identifier, slots}, function(result)
+		MySQL.query(FETCH, {identifier, slots}, function(result)
 			local characters
 			if result then
 				local characterCount = #result
@@ -112,7 +112,7 @@ elseif ESX.GetConfig().Multichar == true then
 			queries[i] = {query = query, values = {v.table, v.column, identifier}}
 		end
 
-		MySQL.Async.transaction(queries, function(result)
+		MySQL.transaction(queries, function(result)
 			if result then
 				print(('[^2INFO^7] Player [%s] %s has deleted a character (%s)'):format(GetPlayerName(source), source, identifier))
 				Citizen.Wait(50)
@@ -124,7 +124,7 @@ elseif ESX.GetConfig().Multichar == true then
 	end
 
 	MySQL.ready(function()
-		MySQL.Async.fetchAll('SELECT TABLE_NAME, COLUMN_NAME, CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ? AND (COLUMN_NAME = ? OR COLUMN_NAME = ?) ', {
+		MySQL.query('SELECT TABLE_NAME, COLUMN_NAME, CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ? AND (COLUMN_NAME = ? OR COLUMN_NAME = ?) ', {
 			DATABASE, 'identifier', 'owner'
 		}, function(result)
 			if result then
@@ -141,7 +141,7 @@ elseif ESX.GetConfig().Multichar == true then
 						queries[#queries+1] = {query = query, values = {k, v}}
 					end
 
-					MySQL.Async.transaction(queries, function(result)
+					MySQL.transaction(queries, function(result)
 						if result then
 							print(('[^2INFO^7] Updated ^5%s^7 columns to use VARCHAR(60)'):format(varsize))
 						else
@@ -158,7 +158,7 @@ elseif ESX.GetConfig().Multichar == true then
 					ESX.Jobs = GetJobs()
 					Citizen.Wait(50)
 				until next(ESX.Jobs)
-				FETCH = MySQL.Sync.store("SELECT identifier, accounts, job, job_grade, firstname, lastname, dateofbirth, sex, skin, disabled FROM users WHERE identifier LIKE ? LIMIT ?")
+				FETCH = MySQL.Sync.store("SELECT identifier, accounts, job, job_grade, firstname, lastname, dateofbirth, sex, skin, disabled FROM users WHERE identifier LIKE ? LIMIT ?") -- Idk how to replace this :DDD
 			end
 		end)
 	end)
