@@ -26,7 +26,7 @@ body {
   display: none;
   position: absolute;
   top: 50%;
-  right: 25;
+  right: 25px;
   transform: translate(0, -50%);
   background: rgba(0, 0, 0, 0.7);
 }
