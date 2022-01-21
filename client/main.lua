@@ -112,6 +112,7 @@ if ESX.GetConfig().Multichar then
 						if Characters[index].sex == _('female') then skin.sex = 1 else skin.sex = 0 end
 					end
 					TriggerEvent('skinchanger:loadSkin', skin)
+					TriggerEvent('esx_multicharacter:loadTattoos', Characters[index].tattoos)
 				end
 				DoScreenFadeIn(400)
 			end)
@@ -128,6 +129,7 @@ if ESX.GetConfig().Multichar then
 				SetModelAsNoLongerNeeded(Characters[index].model)
 			end
 			TriggerEvent('skinchanger:loadSkin', Characters[index].skin)
+			TriggerEvent('esx_multicharacter:loadTattoos', Characters[index].tattoos)
 		end
 		spawned = index
 		local playerPed = PlayerPedId()

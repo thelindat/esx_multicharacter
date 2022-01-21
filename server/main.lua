@@ -158,7 +158,7 @@ elseif ESX.GetConfig().Multichar == true then
 					ESX.Jobs = GetJobs()
 					Citizen.Wait(50)
 				until next(ESX.Jobs)
-				FETCH = MySQL.Sync.store("SELECT identifier, accounts, job, job_grade, firstname, lastname, dateofbirth, sex, skin, disabled FROM users WHERE identifier LIKE ? LIMIT ?")
+				FETCH = MySQL.Sync.store("SELECT identifier, accounts, job, job_grade, firstname, lastname, dateofbirth, sex, skin, tattoos, disabled FROM users WHERE identifier LIKE ? LIMIT ?")
 			end
 		end)
 	end)

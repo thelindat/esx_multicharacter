@@ -8,6 +8,7 @@ COLLATE='utf8mb4_unicode_ci'
 ENGINE=InnoDB
 ;
 
-ALTER TABLE `users` ADD COLUMN
-	`disabled` TINYINT(1) NULL DEFAULT '0'
+ALTER TABLE `users` 
+	ADD COLUMN `disabled` TINYINT(1) NULL DEFAULT '0',
+	ADD COLUMN `tattoos` LONGTEXT NULL
 ;
