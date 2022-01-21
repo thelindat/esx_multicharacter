@@ -77,6 +77,7 @@ elseif ESX.GetConfig().Multichar == true then
 						lastname = i.lastname,
 						dateofbirth = i.dateofbirth,
 						skin = json.decode(i.skin),
+						tattoos = json.decode(i.tattoos),
 						disabled = i.disabled,
 						sex = i.sex == 'm' and _('male') or _('female')
 					}
